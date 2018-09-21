@@ -9,7 +9,7 @@ Script to fix USB ports on Ryzen Systems.
 Open Terminal and run the following command :
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/XLNCs/ryzenusbfix/master/ryzenusbfix.sh)"
+curl -s -o ~/Desktop/ryzenusbfix.sh https://raw.githubusercontent.com/XLNCs/ryzenusbfix/master/ryzenusbfix.sh && chmod +x ~/Desktop/ryzenusbfix.sh && ~/Desktop/ryzenusbfix.sh
 
 #Or
 
