@@ -112,7 +112,7 @@ function method1() {
 	else
 		echo -e "\n[ALERT] DSDT decompiled successfully."
 		echo -e "\n[RUNNING] Patching DSDT Table.\n"
-		$PATCH /tmp/XLNC/DSDT.dsl /tmp/XLNC/ryzenusbpatch.txt /tmp/XLNC/PATCHED.dsl
+		$PATCH /tmp/XLNC/DSDT.dsl /tmp/XLNC/patch.txt /tmp/XLNC/PATCHED.dsl
 		if ! [ -e /tmp/XLNC/PATCHED.dsl ]; then
 			echo -e "\n[ERROR] Patched DSDT could not be generated using method #1. \n[RUNNING] Trying method #2."
 			RUN=1
