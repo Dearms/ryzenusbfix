@@ -168,15 +168,22 @@ fi
 if [ -e /Volumes/EFI/EFI/CLOVER/config.plist ]; then
 	config="/Volumes/EFI/EFI/CLOVER/config.plist"
 	echo -e "\n[RUNNING] Patching config.plist"
-	$KEXTTOPATCH $config Has -find "21F281FA 000002" -replace "21F281FA 000011" -name AppleUSBXHCI || $KEXTTOPATCH $config add -find "21F281FA 000002" -replace "21F281FA 000011" -name AppleUSBXHCI
-	$KEXTTOPATCH $config Has -find "D1000000 83F901" -replace "D1000000 83F910" -name AppleUSBXHCI || $KEXTTOPATCH $config add -find "D1000000 83F901" -replace "D1000000 83F910" -name AppleUSBXHCI
-	$KEXTTOPATCH $config Has -find "83BD7CFF FFFF0F" -replace "83BD7CFF FFFF1F" -name AppleUSBXHCI || $KEXTTOPATCH $config add -find "83BD7CFF FFFF0F" -replace "83BD7CFF FFFF1F" -name AppleUSBXHCI
-	$KEXTTOPATCH $config Has -find "837D940F 0F839704 0000" -replace "837D940F 90909090 9090" -name AppleUSBXHCI || $KEXTTOPATCH $config add -find "837D940F 0F839704 0000" -replace "837D940F 90909090 9090" -name AppleUSBXHCI
+	$KEXTTOPATCH $config Has -find "21F281FA 000002" -replace "21F281FA 000011" -name com.apple.driver.usb.AppleUSBXHCI || $KEXTTOPATCH $config add -find "21F281FA 000002" -replace "21F281FA 000011" -name com.apple.driver.usb.AppleUSBXHCI
+	$KEXTTOPATCH $config Has -find "D1000000 83F901" -replace "D1000000 83F910" -name com.apple.driver.usb.AppleUSBXHCI || $KEXTTOPATCH $config add -find "D1000000 83F901" -replace "D1000000 83F910" -name com.apple.driver.usb.AppleUSBXHCI
+	$KEXTTOPATCH $config Has -find "83BD7CFF FFFF0F" -replace "83BD7CFF FFFF1F" -name com.apple.driver.usb.AppleUSBXHCI || $KEXTTOPATCH $config add -find "83BD7CFF FFFF0F" -replace "83BD7CFF FFFF1F" -name com.apple.driver.usb.AppleUSBXHCI
+	if [[ $(sw_vers -productVersion) =~ (10.13|10.13.0|10.13.1|10.13.2|10.13.3)$ ]]; then
+		$KEXTTOPATCH $config Has -find "837D8C10" -replace "837D8C1B" -name com.apple.driver.usb.AppleUSBXHCIPCI || $KEXTTOPATCH $config add -find "837D8C10" -replace "837D8C1B" -name com.apple.driver.usb.AppleUSBXHCIPCI
+	elif [[ $(sw_vers -productVersion) =~ (10.13.4|10.13.5)$ ]]; then
+		$KEXTTOPATCH $config Has -find "837D940F 0F839704 0000" -replace "837D940F 90909090 9090" -name com.apple.driver.usb.AppleUSBXHCI || $KEXTTOPATCH $config add -find "837D940F 0F839704 0000" -replace "837D940F 90909090 9090" -name com.apple.driver.usb.AppleUSBXHCI
+	elif [[ $(sw_vers -productVersion) == 10.13.6 ]]; then
+		$KEXTTOPATCH $config Has -find "837D880F 0F83A704 0000" -replace "837D880F 90909090 9090" -name com.apple.driver.usb.AppleUSBXHCI || $KEXTTOPATCH $config add -find "837D880F 0F83A704 0000" -replace "837D880F 90909090 9090" -name com.apple.driver.usb.AppleUSBXHCI
+	fi
 else
 	echo -e "\n[ERROR] Installed clover have config.plist missing \n[ALERT] USB ports might not work completely \n[EXITING] ..."
 	exit 1
 fi
 
-rm -rf "/tmp/XLNC"
-echo -e "[ALERT] Patching completed successfully."
+rm -rf /tmp/XLNC ~/Desktop/ryzenusbfix.sh
+echo -e "\n[ALERT] Patching completed successfully, Please reboot the system ! \n[ALERT] You might also need to un-plug and re-plug all your USB devices."
+
 sleep 3 && exit 0
