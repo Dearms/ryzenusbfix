@@ -3,16 +3,26 @@
 # XLNC
 # 20/08/18
 
-#Save ass check for non-ryzen systems
-sysctl -n machdep.cpu.brand_string | grep Ryzen &>/dev/null
-if [ $? != 0 ]; then
-	echo -e "\n[ERROR] Can't proceed, This fix only works for Ryzen CPU's. \n[EXITING] ..."
-	sleep 5 && exit 1
-fi
-
 if ! [ "$(id -u)" = 0 ]; then
 	sudo "$0" "$1"
 	exit 0
+fi
+
+function quit(){
+echo -e "\n[EXITING] ..."
+sleep 5
+rm -rf ~/Desktop/ryzenusbfix.sh /tmp/XLNC
+exit 1
+}
+
+stty -echoctl
+trap 'quit' SIGINT SIGTERM SIGHUP
+
+#Save ass check for non-ryzen systems
+sysctl -n machdep.cpu.brand_string | grep Ryzen &>/dev/null
+if [ $? != 0 ]; then
+	echo -e "\n[ERROR] Can't proceed, This fix only works for Ryzen CPU's."
+	quit
 fi
 
 #START
@@ -48,8 +58,8 @@ for FILE in "${FILES[@]}"; do
 	else
 		curl -s -o /tmp/XLNC/"$FILE" https://raw.githubusercontent.com/XLNCs/ryzenusbfix/master/Files/"$FILE"
 		if ! [ $? = 0 ]; then
-			echo -e "\n[ERROR] Cant Download "$FILE" \n[Exiting] ..."
-			sleep 3 && exit 1
+			echo -e "\n[ERROR] Cant Download "$FILE""
+			quit
 		fi
 	fi
 done
@@ -62,18 +72,18 @@ diskutil mount /dev/"$DRIVE"s1 >/dev/null 2>&1
 #PRE-RUN CHECK
 if ! [ -e /Volumes/EFI/ ]; then
 	echo -e "\n[ERROR] EFI not mounted or not present"
-	echo -e "\n[ALERT] Mount your EFI partition manually using Terminal and try again. \n[EXITING] ..."
-	sleep 2 && exit 1
+	echo -e "\n[ALERT] Mount your EFI partition manually using Terminal and try again."
+	quit
 fi
 if ! [ -e /Volumes/EFI/EFI/CLOVER ]; then
-	echo -e "\n[ERROR] Clover not installed \n[Exiting] ..."
-	sleep 2 && exit 1
+	echo -e "\n[ERROR] Clover not installed."
+	quit
 fi
 if [ -e /Volumes/EFI/EFI/CLOVER/ACPI/patched/DSDT.aml ]; then
 	echo -e "\n[RUNNING] Existing DSDT.aml detected in EFI \n[DELETING] ..."
 	rm -rf /Volumes/EFI/EFI/CLOVER/ACPI/patched/DSDT.aml
 	echo -e "\n[ALERT] Now reboot the system and re-run the ryzenusbfix"
-	exit 1
+	quit
 fi
 for folders in /Volumes/EFI/EFI/CLOVER/kexts/*; do
 	if [ -e $folders/DummyUSBXHCIPCI.kext ] || [ -e $folders/DummyUSBEHCIPCI.kext ] || [ -e $folders/GenericUSBXHCI.kext ]; then
@@ -133,21 +143,21 @@ function Method2() {
 	echo -e "\n[RUNNING] Decompiling DSDT using method #2.\n"
 	$CONV /tmp/XLNC/DSDT.aml
 	if ! [ -e /tmp/XLNC/DSDT.dsl ]; then
-		echo -e "\n[ERROR] DSDT could not be decompiled using method #2. \n[EXITING] ..."
-		exit 1
+		echo -e "\n[ERROR] DSDT could not be decompiled using method #2."
+		quit
 	else
 		echo -e "\n[ALERT] DSDT decompiled successfully using method #2."
 		echo -e "\n[RUNNING] Patching DSDT Table\n"
 		$PATCH /tmp/XLNC/DSDT.dsl /tmp/XLNC/patch.txt /tmp/XLNC/PATCHED.dsl
 		if ! [ -e /tmp/XLNC/PATCHED.dsl ]; then
-			echo -e "\n[RUNNING] Patched DSDT could not be generated using method #2. \n[EXITING] ..."
-			exit 1
+			echo -e "\n[RUNNING] Patched DSDT could not be generated using method #2."
+			quit
 		else
 			echo -e "\n[ALERT] Patched DSDT generated successfully using method #2.\n"
 			$CONV -ve /tmp/XLNC/PATCHED.dsl
 			if ! [ -e /tmp/XLNC/PATCHED.aml ]; then
-				echo -e "\n[ERROR] Patched DSDT could not be compiled using method #2. \n[Exiting] ..."
-				exit 1
+				echo -e "\n[ERROR] Patched DSDT could not be compiled using method #2."
+				quit
 			fi
 		fi
 	fi
@@ -179,11 +189,10 @@ if [ -e /Volumes/EFI/EFI/CLOVER/config.plist ]; then
 		$KEXTTOPATCH $config Has -find "837D880F 0F83A704 0000" -replace "837D880F 90909090 9090" -name com.apple.driver.usb.AppleUSBXHCI || $KEXTTOPATCH $config add -find "837D880F 0F83A704 0000" -replace "837D880F 90909090 9090" -name com.apple.driver.usb.AppleUSBXHCI
 	fi
 else
-	echo -e "\n[ERROR] Installed clover have config.plist missing \n[ALERT] USB ports might not work completely \n[EXITING] ..."
-	exit 1
+	echo -e "\n[ERROR] Installed clover have config.plist missing \n[ALERT] USB ports might not work completely."
+	quit
 fi
 
-rm -rf /tmp/XLNC ~/Desktop/ryzenusbfix.sh
 echo -e "\n[ALERT] Patching completed successfully, Please reboot the system ! \n[ALERT] You might also need to un-plug and re-plug all your USB devices."
-
-sleep 3 && exit 0
+rm -rf ~/Desktop/ryzenusbfix.sh /tmp/XLNC 
+sleep 5 && exit 0
