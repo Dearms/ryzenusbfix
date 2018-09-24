@@ -164,7 +164,7 @@ function Method2() {
 }
 
 method1
-if [ $RUN = 1 ]; then
+if [ "$RUN" = "1" ]; then
 	Method2
 fi
 
