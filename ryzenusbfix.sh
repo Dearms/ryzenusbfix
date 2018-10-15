@@ -38,6 +38,8 @@ echo -e "${ITL}  * - Date: 15/08/2018 ${STD}"
 echo -e "${ITL}  */ ${STD}"
 echo
 
+echo -e "\n Starting ..." && sleep 3
+
 if [ -e /tmp/XLNC ]; then
 	rm -rf "/tmp/XLNC" && mkdir /tmp/XLNC
 else
@@ -178,9 +180,13 @@ fi
 if [ -e /Volumes/EFI/EFI/CLOVER/config.plist ]; then
 	config="/Volumes/EFI/EFI/CLOVER/config.plist"
 	echo -e "\n[RUNNING] Patching config.plist"
-	$KEXTTOPATCH $config Has -find "21F281FA 000002" -replace "21F281FA 000011" -name com.apple.driver.usb.AppleUSBXHCI || $KEXTTOPATCH $config add -find "21F281FA 000002" -replace "21F281FA 000011" -name com.apple.driver.usb.AppleUSBXHCI
-	$KEXTTOPATCH $config Has -find "D1000000 83F901" -replace "D1000000 83F910" -name com.apple.driver.usb.AppleUSBXHCI || $KEXTTOPATCH $config add -find "D1000000 83F901" -replace "D1000000 83F910" -name com.apple.driver.usb.AppleUSBXHCI
-	$KEXTTOPATCH $config Has -find "83BD7CFF FFFF0F" -replace "83BD7CFF FFFF1F" -name com.apple.driver.usb.AppleUSBXHCI || $KEXTTOPATCH $config add -find "83BD7CFF FFFF0F" -replace "83BD7CFF FFFF1F" -name com.apple.driver.usb.AppleUSBXHCI
+	if [[ $(sw_vers -productVersion) =~ (10.13|10.13.0|10.13.1|10.13.2|10.13.3)$ ]]; then
+	        $KEXTTOPATCH $config Has -find "21F281FA 000002" -replace "21F281FA 000011" -name com.apple.driver.usb.AppleUSBXHCI || $KEXTTOPATCH $config add -find "21F281FA 000002" -replace "21F281FA 000011" -name com.apple.driver.usb.AppleUSBXHCI
+	        $KEXTTOPATCH $config Has -find "D1000000 83F901" -replace "D1000000 83F910" -name com.apple.driver.usb.AppleUSBXHCI || $KEXTTOPATCH $config add -find "D1000000 83F901" -replace "D1000000 83F910" -name com.apple.driver.usb.AppleUSBXHCI
+	        $KEXTTOPATCH $config Has -find "83BD7CFF FFFF0F" -replace "83BD7CFF FFFF1F" -name com.apple.driver.usb.AppleUSBXHCI || $KEXTTOPATCH $config add -find "83BD7CFF FFFF0F" -replace "83BD7CFF FFFF1F" -name com.apple.driver.usb.AppleUSBXHCI
+	elif [[ $(sw_vers -productVersion) =~ (10.13.4|10.13.5|10.13.6)$ ]]; then
+	        $KEXTTOPATCH $config Has -find "C8000000 83FB02" -replace "C8000000 83FB11" -name com.apple.driver.usb.AppleUSBXHCI || $KEXTTOPATCH $config add -find "C8000000 83FB02" -replace "C8000000 83FB11" -name com.apple.driver.usb.AppleUSBXHCI
+	fi
 	if [[ $(sw_vers -productVersion) =~ (10.13|10.13.0|10.13.1|10.13.2|10.13.3)$ ]]; then
 		$KEXTTOPATCH $config Has -find "837D8C10" -replace "837D8C1B" -name com.apple.driver.usb.AppleUSBXHCIPCI || $KEXTTOPATCH $config add -find "837D8C10" -replace "837D8C1B" -name com.apple.driver.usb.AppleUSBXHCIPCI
 	elif [[ $(sw_vers -productVersion) =~ (10.13.4|10.13.5)$ ]]; then
