@@ -65,12 +65,18 @@ URL  : http://raw.github.com/AlGreyy/Ryzen-USB-fix-/master
 - Click on **`Kernel And Kexts Patches`** section on Clover Configurator window and under **`KextToPatch`** box add these following patches.
 
 ```bash
+## For macOS 10.13 / 10.13.1 / 10.13.2 / 10.13.3
     Name             Find               Replace
 AppleUSBXHCI    21F281FA 000002     21F281FA 000011
 AppleUSBXHCI    D1000000 83F901     D1000000 83F910
 AppleUSBXHCI    83BD7CFF FFFF0F     83BD7CFF FFFF1F
+
+## For macOS 10.13.4 / 10.13.5 / 10.13.6 
+    Name             Find               Replace
+AppleUSBXHCI    C8000000 83FB02      C8000000 83FB11       
+
 ```
-- When done save the changes by navigating to **`File -> Save`** from menu bar.
+- When done , save the changes by navigating to **`File -> Save`** from menu bar.
 
  ----------
 ### Now reboot the system for changes to take effect.
