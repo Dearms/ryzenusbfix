@@ -55,8 +55,8 @@ FILES=(
 )
 DIR=${0%/*}
 for FILE in "${FILES[@]}"; do
-	if [ -e "$DIR"/utils/"$FILE" ]; then
-		cp -rf "$DIR"/utils/"$FILE" /tmp/XLNC/"$FILE"
+	if [ -e "$DIR"/Files/"$FILE" ]; then
+		cp -rf "$DIR"/Files/"$FILE" /tmp/XLNC/"$FILE"
 	else
 		curl -s -o /tmp/XLNC/"$FILE" https://raw.githubusercontent.com/XLNCs/ryzenusbfix/master/Files/"$FILE"
 		if ! [ $? = 0 ]; then
